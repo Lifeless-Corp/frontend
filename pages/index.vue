@@ -7,10 +7,9 @@
         <div class="flex flex-col items-center justify-center">
           <div class="mb-4 flex items-center justify-center w-24 h-24 rounded-full shadow-lg">
             <!-- Ganti CompassIcon dengan img SVG -->
-            <img src="/images/logo.svg" alt="LifeSearch Logo" class="w-full h-full" />
+            <img src="/images/logo.svg" alt="Organa Logo" class="w-full h-full" />
           </div>
-          <h1 class="text-5xl font-bold text-black">LifeSearch</h1>
-          <p class="mt-2 text-gray-500 text-sm">by Lifeless</p>
+          <h1 class="text-5xl font-bold text-black">Organa</h1>
         </div>
       </div>
 

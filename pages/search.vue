@@ -10,11 +10,10 @@
               <nuxt-link to="/" class="flex items-center">
                 <div class="flex items-center">
                   <div class="w-10 h-10 rounded-full flex items-center justify-center mr-2">
-                  <img src="/images/logo.svg" alt="LifeSearch Logo" class="w-full h-full" />
+                  <img src="/images/logo.svg" alt="Organa Logo" class="w-full h-full" />
                   </div>
                   <div>
-                    <h1 class="text-xl font-bold text-black">LifeSearch</h1>
-                    <p class="text-xs text-gray-500 -mt-1">by Lifeless</p>
+                    <h1 class="text-xl font-bold text-black">Organa</h1>
                   </div>
                 </div>
               </nuxt-link>
