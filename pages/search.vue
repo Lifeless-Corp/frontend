@@ -10,7 +10,7 @@
               <nuxt-link to="/" class="flex items-center">
                 <div class="flex items-center">
                   <div class="w-10 h-10 rounded-full flex items-center justify-center mr-2">
-            <img src="/images/logo.svg" alt="LifeSearch Logo" class="w-full h-full" />
+                  <img src="/images/logo.svg" alt="LifeSearch Logo" class="w-full h-full" />
                   </div>
                   <div>
                     <h1 class="text-xl font-bold text-black">LifeSearch</h1>
@@ -179,76 +179,30 @@ const route = useRoute()
 const router = useRouter()
 const searchQuery = ref('')
 const searchResults = ref([])
-const isLoading = ref(false) // Initialize to false
+const isLoading = ref(false) 
 const error = ref(null)
 
-// Mock search results data
-const mockSearchData = [
-  {
-    title: 'Nuxt.js - Kerangka Kerja Vue.js Intuitif',
-    url: 'https://nuxt.com',
-    description: 'Nuxt adalah kerangka kerja Vue.js yang intuitif. Ini memudahkan pembuatan aplikasi Vue.js dengan server-side rendering, static site generation, dan banyak fitur lainnya.',
-    favicon: 'https://nuxt.com/icon.png'
-  },
-  {
-    title: 'Vue.js - Framework JavaScript Progresif',
-    url: 'https://vuejs.org',
-    description: 'Vue.js adalah framework JavaScript progresif untuk membangun antarmuka pengguna. Tidak seperti framework monolitik lainnya, Vue dirancang dari awal untuk dapat diadopsi secara bertahap.',
-    favicon: 'https://vuejs.org/logo.png'
-  },
-  {
-    title: 'Tailwind CSS - Framework CSS Utility-First',
-    url: 'https://tailwindcss.com',
-    description: 'Tailwind CSS adalah framework CSS utility-first untuk membangun desain kustom dengan cepat tanpa meninggalkan HTML Anda.',
-    favicon: 'https://tailwindcss.com/favicon.ico'
-  },
-  {
-    title: 'JavaScript - MDN Web Docs',
-    url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript',
-    description: 'JavaScript (JS) adalah bahasa pemrograman yang ringan, ditafsirkan, atau just-in-time dikompilasi dengan fungsi kelas satu.',
-    favicon: 'https://developer.mozilla.org/favicon.ico'
-  },
-  {
-    title: 'TypeScript: JavaScript dengan Sintaks untuk Tipe',
-    url: 'https://www.typescriptlang.org',
-    description: 'TypeScript adalah JavaScript dengan sintaks untuk tipe. TypeScript adalah bahasa pemrograman open-source yang dibangun di atas JavaScript.',
-    favicon: 'https://www.typescriptlang.org/favicon.ico'
-  },
-  {
-    title: 'GitHub: Where the world builds software',
-    url: 'https://github.com',
-    description: 'GitHub adalah platform pengembangan perangkat lunak yang memungkinkan Anda menyimpan, melacak, dan berkolaborasi pada proyek perangkat lunak.',
-    favicon: 'https://github.com/favicon.ico'
-  },
-  {
-    title: 'Stack Overflow - Where Developers Learn, Share, & Build',
-    url: 'https://stackoverflow.com',
-    description: 'Stack Overflow adalah komunitas pengembang terbesar dan paling tepercaya untuk berbagi pengetahuan pemrograman, membangun karier mereka, dan memecahkan masalah pemrograman mereka.',
-    favicon: 'https://stackoverflow.com/favicon.ico'
-  }
-]
-
-// Simulate API call with delay
+// Replace mock implementation with real API call
 const searchAPI = async (query) => {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 1200))
-  
-  // Simulate search logic
   if (!query.trim()) {
     return []
   }
   
-  // Simulate random error (1 in 10 chance)
-  if (Math.random() < 0.1) {
-    throw new Error('Terjadi kesalahan saat mencari. Silakan coba lagi.')
+  try {
+    // Assume the API endpoint is at /api/search with a query parameter
+    const config = useRuntimeConfig()
+    const response = await fetch(`${config.public.NUXT_PUBLIC_API_URL}/articles/search?query=${encodeURIComponent(query.trim())}`)
+    
+    if (!response.ok) {
+      // Handle HTTP errors
+      throw new Error(`Error: ${response.status} - ${response.statusText}`)
+    }
+    
+    const data = await response.json()
+    return data.results || [] // Adjust based on your API response structure
+  } catch (err) {
+    throw new Error('Terjadi kesalahan saat menghubungi server. Silakan coba lagi.')
   }
-  
-  // Filter mock data based on query
-  const normalizedQuery = query.toLowerCase()
-  return mockSearchData.filter(item => 
-    item.title.toLowerCase().includes(normalizedQuery) || 
-    item.description.toLowerCase().includes(normalizedQuery)
-  )
 }
 
 // Search function
@@ -280,7 +234,7 @@ const initializeSearch = async () => {
   const query = route.query.q
   if (query) {
     searchQuery.value = query.toString()
-    isLoading.value = true // Set loading to true before search
+    isLoading.value = true
     try {
       searchResults.value = await searchAPI(searchQuery.value)
     } catch (err) {
@@ -295,7 +249,7 @@ onMounted(async () => {
   if (route.query.q) {
     await initializeSearch();
   } else {
-    isLoading.value = false; // Ensure loading is set to false if no query
+    isLoading.value = false;
   }
 });
 </script>
