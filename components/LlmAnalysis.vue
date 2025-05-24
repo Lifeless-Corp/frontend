@@ -84,24 +84,19 @@ async function getOverview() {
   try {
     const config = useRuntimeConfig()
     console.log(props.documents)
-    const response = await fetch(`${config.public.NUXT_PUBLIC_API_URL}/llm/analyze`, {
+    const response = await fetch(`${config.public.NUXT_PUBLIC_API_URL}/llm/summarize`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        query: props.query,
-        documents: props.documents,
-        temperature: 0.3,
-        max_tokens: 500
-      })
-    })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(props.documents.slice(0, 10)) // Kirim top-10 artikel
+    })  
     
     if (!response.ok) {
       throw new Error(`Error: ${response.status} - ${await response.text()}`)
     }
+
+    const data = await response.json()
+    results.value = { response: data.summary }
     
-    results.value = await response.json()
   } catch (err) {
     console.error('LLM overview error:', err)
     error.value = `Failed to generate overview: ${err.message}`
