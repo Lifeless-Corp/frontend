@@ -81,10 +81,10 @@
       </div>
       
       <!-- LLM Analysis (AI Overview) -->
-      <div v-if="searchResults.length > 0" class="mb-6">
+      <div v-if="searchResults.results.length > 0" class="mb-6">
         <LlmAnalysis 
           :query="searchQuery"
-          :documents="searchResults"
+          :documents="searchResults.results"
         />
       </div>
       
@@ -119,12 +119,12 @@
           
           <!-- Authors if available -->
           <p class="text-sm text-gray-700 mb-2" v-if="result.authors && result.authors.length">
-            {{ result.authors.join(', ') }}
+            {{ result.authors.map(author => author.full_name).join(', ') }}
           </p>
           
           <!-- Journal if available -->
           <p class="text-sm text-gray-500 mb-2" v-if="result.journal">
-            {{ result.journal }}
+            {{ result.journal.title }}
           </p>
           
           <!-- Abstract with show more/less -->
