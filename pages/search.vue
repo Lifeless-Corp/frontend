@@ -10,7 +10,7 @@
               <nuxt-link to="/" class="flex items-center">
                 <div class="flex items-center">
                   <div class="w-10 h-10 rounded-full flex items-center justify-center mr-2">
-                  <img src="/images/logo.svg" alt="Organa Logo" class="w-full h-full" />
+                    <img src="/images/logo.svg" alt="Organa Logo" class="w-full h-full" />
                   </div>
                   <div>
                     <h1 class="text-xl font-bold text-black">Organa</h1>
@@ -18,33 +18,24 @@
                 </div>
               </nuxt-link>
             </div>
-            
+
             <!-- Search Form -->
             <div class="flex-grow max-w-2xl">
               <form @submit.prevent="performSearch" class="relative">
-                <input
-                  v-model="searchQuery"
-                  type="text"
-                  class="w-full py-2 px-4 pr-12 border border-gray-300 rounded-full hover:shadow-sm focus:shadow-sm focus:outline-none focus:ring-2 focus:ring-black"
-                />
-                <button
-                  type="button"
-                  @click="clearSearch"
-                  v-if="searchQuery"
-                  class="absolute right-12 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
+                <input v-model="searchQuery" type="text"
+                  class="w-full py-2 px-4 pr-12 border border-gray-300 rounded-full hover:shadow-sm focus:shadow-sm focus:outline-none focus:ring-2 focus:ring-black" />
+                <button type="button" @click="clearSearch" v-if="searchQuery"
+                  class="absolute right-12 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
                   <XIcon class="w-4 h-4" />
                 </button>
-                <button
-                  type="submit"
-                  class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-black p-1"
-                >
+                <button type="submit"
+                  class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-black p-1">
                   <SearchIcon class="w-4 h-4" />
                 </button>
               </form>
             </div>
           </div>
-          
+
           <!-- User Profile -->
           <div class="mt-3 md:mt-0 md:ml-4 flex items-center">
             <button class="p-2 text-gray-600 hover:bg-gray-100 rounded-full">
@@ -55,7 +46,7 @@
             </button>
           </div>
         </div>
-        
+
         <!-- Search Categories -->
         <div class="mt-3 flex space-x-6 text-sm border-b border-gray-200">
           <button class="pb-2 px-1 text-black border-b-2 border-black font-medium flex items-center">
@@ -85,15 +76,15 @@
     <!-- Main Content -->
     <main class="flex-grow container mx-auto px-4 py-4">
       <!-- Search Stats -->
-      <div class="text-sm text-gray-600 mb-5" v-if="!isLoading && searchResults.length > 0">
-        Sekitar {{ searchResults.length * 1000 }} hasil ({{ (Math.random() * 0.5 + 0.1).toFixed(2) }} detik)
+      <div class="text-sm text-gray-600 mb-5" v-if="!isLoading && searchResults.results.length > 0">
+        Sekitar {{ searchResults.total }} hasil ({{ searchResults.time }} detik)
       </div>
       
       <!-- LLM Analysis (AI Overview) -->
-      <div v-if="searchResults.length > 0" class="mb-6">
+      <div v-if="searchResults.results.length > 0" class="mb-6">
         <LlmAnalysis 
           :query="searchQuery"
-          :documents="searchResults"
+          :documents="searchResults.results"
         />
       </div>
       
@@ -114,8 +105,8 @@
       </div>
 
       <!-- Search Results -->
-      <div v-else-if="searchResults.length > 0" class="space-y-8 max-w-3xl">
-        <div v-for="(result, index) in searchResults" :key="index" class="result border-b border-gray-200 pb-6">
+      <div v-else-if="searchResults.results.length > 0" class="space-y-8 max-w-3xl">
+        <div v-for="(result, index) in searchResults.results" :key="index" class="result">
           <div class="mb-1 flex items-center">
             <img v-if="result.favicon" :src="result.favicon" alt="Site icon" class="w-4 h-4 mr-2" />
             <a :href="result.url" class="text-sm text-gray-600 hover:underline truncate">
@@ -128,12 +119,12 @@
           
           <!-- Authors if available -->
           <p class="text-sm text-gray-700 mb-2" v-if="result.authors && result.authors.length">
-            {{ result.authors.join(', ') }}
+            {{ result.authors.map(author => author.full_name).join(', ') }}
           </p>
           
           <!-- Journal if available -->
           <p class="text-sm text-gray-500 mb-2" v-if="result.journal">
-            {{ result.journal }}
+            {{ result.journal.title }}
           </p>
           
           <!-- Abstract with show more/less -->
@@ -155,7 +146,7 @@
             {{ result.description }}
           </p>
         </div>
-        
+
         <!-- Pagination -->
         <div class="mt-10 flex justify-center">
           <div class="inline-flex items-center">
@@ -164,12 +155,17 @@
             </button>
             <div class="flex space-x-1">
               <button class="w-8 h-8 flex items-center justify-center rounded-full bg-black text-white">1</button>
-              <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-black">2</button>
-              <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-black">3</button>
-              <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-black">4</button>
-              <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-black">5</button>
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-black">2</button>
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-black">3</button>
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-black">4</button>
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-black">5</button>
               <span class="w-8 h-8 flex items-center justify-center">...</span>
-              <button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-black">10</button>
+              <button
+                class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-black">10</button>
             </div>
             <button class="px-4 py-2 text-black font-medium">
               <ChevronRightIcon class="w-5 h-5" />
@@ -216,8 +212,8 @@ import LlmAnalysis from '~/components/LlmAnalysis.vue'
 const route = useRoute()
 const router = useRouter()
 const searchQuery = ref('')
-const searchResults = ref([])
-const isLoading = ref(false) 
+const searchResults = ref({ results: [], time: 0, total: 0, page: 1, size: 10 }) // Initialize with empty results
+const isLoading = ref(false)
 const error = ref(null)
 const expandedAbstracts = ref({}) // Add this to track expanded abstracts
 
@@ -226,19 +222,19 @@ const searchAPI = async (query) => {
   if (!query.trim()) {
     return []
   }
-  
+
   try {
     // Assume the API endpoint is at /api/search with a query parameter
     const config = useRuntimeConfig()
     const response = await fetch(`${config.public.NUXT_PUBLIC_API_URL}/articles/search?query=${encodeURIComponent(query.trim())}`)
-    
+
     if (!response.ok) {
       // Handle HTTP errors
       throw new Error(`Error: ${response.status} - ${response.statusText}`)
     }
-    
+
     const data = await response.json()
-    return data.results || [] // Adjust based on your API response structure
+    return data
   } catch (err) {
     console.error('Search API error:', err)
     throw err
