@@ -110,13 +110,12 @@
           <div class="mb-1 flex items-center">
             <img v-if="result.favicon" :src="result.favicon" alt="Site icon" class="w-4 h-4 mr-2" />
             <a :href="result.url" class="text-sm text-gray-600 hover:underline truncate">
-              {{ result.pmid ? `PMID: ${result.pmid}` : result.url }}
+              {{ result.pmcid ? `PMCID: ${result.pmcid}` : result.url }}
             </a>
           </div>
           <h3 class="text-xl text-black hover:underline mb-1">
-            <a :href="result.url" target="_blank">{{ result.title }}</a>
+            <NuxtLink :to="`/article/${result.pmcid}`">{{ result.title }}</NuxtLink>
           </h3>
-          
           <!-- Authors if available -->
           <p class="text-sm text-gray-700 mb-2" v-if="result.authors && result.authors.length">
             {{ result.authors.map(author => author.full_name).join(', ') }}

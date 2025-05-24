@@ -84,18 +84,18 @@ async function getOverview() {
   try {
     const config = useRuntimeConfig()
     console.log(props.documents)
-    const response = await fetch(`${config.public.NUXT_PUBLIC_API_URL}/llm/analyze`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        query: props.query,
-        documents: props.documents,
-        temperature: 0.3,
-        max_tokens: 500
+    const docs = props.documents.slice(0, 10).map(doc => {
+        return {
+          title: doc.title,
+          abstract: doc.abstract,
+        }
       })
-    })
+    console.log(docs)
+    const response = await fetch(`${config.public.NUXT_PUBLIC_API_URL}/llm/summarize`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(docs) // Kirim top-10 artikel
+    })  
     
     if (!response.ok) {
       throw new Error(`Error: ${response.status} - ${await response.text()}`)
