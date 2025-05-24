@@ -115,7 +115,7 @@
           <h3 class="text-xl text-black hover:underline mb-1">
             <a :href="result.url" target="_blank">{{ result.title }}</a>
           </h3>
-          <p class="text-sm text-gray-700">{{ result.description }}</p>
+          <p class="text-sm text-gray-700">{{ result.abstract }}</p>
         </div>
         
         <!-- Pagination -->
