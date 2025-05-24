@@ -51,23 +51,7 @@
         <div class="mt-3 flex space-x-6 text-sm border-b border-gray-200">
           <button class="pb-2 px-1 text-black border-b-2 border-black font-medium flex items-center">
             <SearchIcon class="w-4 h-4 mr-1" />
-            <span>Semua</span>
-          </button>
-          <button class="pb-2 px-1 text-gray-600 hover:text-black flex items-center">
-            <ImageIcon class="w-4 h-4 mr-1" />
-            <span>Gambar</span>
-          </button>
-          <button class="pb-2 px-1 text-gray-600 hover:text-black flex items-center">
-            <MapPinIcon class="w-4 h-4 mr-1" />
-            <span>Maps</span>
-          </button>
-          <button class="pb-2 px-1 text-gray-600 hover:text-black flex items-center">
-            <NewspaperIcon class="w-4 h-4 mr-1" />
-            <span>Berita</span>
-          </button>
-          <button class="pb-2 px-1 text-gray-600 hover:text-black flex items-center">
-            <VideoIcon class="w-4 h-4 mr-1" />
-            <span>Video</span>
+            <span>Artikel</span>
           </button>
         </div>
       </div>
@@ -114,7 +98,7 @@
             </a>
           </div>
           <h3 class="text-xl text-black hover:underline mb-1">
-            <a :href="result.url" target="_blank">{{ result.title }}</a>
+            <NuxtLink :to="`/article/${result.pmid}`">{{ result.title }}</NuxtLink>
           </h3>
           
           <!-- Authors if available -->
