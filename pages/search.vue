@@ -89,6 +89,14 @@
         Sekitar {{ searchResults.length * 1000 }} hasil ({{ (Math.random() * 0.5 + 0.1).toFixed(2) }} detik)
       </div>
       
+      <!-- LLM Analysis (AI Overview) -->
+      <div v-if="searchResults.length > 0" class="mb-6">
+        <LlmAnalysis 
+          :query="searchQuery"
+          :documents="searchResults"
+        />
+      </div>
+      
       <!-- Loading State -->
       <div v-if="isLoading" class="flex justify-center my-12">
         <div class="flex flex-col items-center">
@@ -107,15 +115,45 @@
 
       <!-- Search Results -->
       <div v-else-if="searchResults.length > 0" class="space-y-8 max-w-3xl">
-        <div v-for="(result, index) in searchResults" :key="index" class="result">
+        <div v-for="(result, index) in searchResults" :key="index" class="result border-b border-gray-200 pb-6">
           <div class="mb-1 flex items-center">
             <img v-if="result.favicon" :src="result.favicon" alt="Site icon" class="w-4 h-4 mr-2" />
-            <a :href="result.url" class="text-sm text-gray-600 hover:underline truncate">{{ result.url }}</a>
+            <a :href="result.url" class="text-sm text-gray-600 hover:underline truncate">
+              {{ result.pmid ? `PMID: ${result.pmid}` : result.url }}
+            </a>
           </div>
           <h3 class="text-xl text-black hover:underline mb-1">
             <a :href="result.url" target="_blank">{{ result.title }}</a>
           </h3>
-          <p class="text-sm text-gray-700">{{ result.abstract }}</p>
+          
+          <!-- Authors if available -->
+          <p class="text-sm text-gray-700 mb-2" v-if="result.authors && result.authors.length">
+            {{ result.authors.join(', ') }}
+          </p>
+          
+          <!-- Journal if available -->
+          <p class="text-sm text-gray-500 mb-2" v-if="result.journal">
+            {{ result.journal }}
+          </p>
+          
+          <!-- Abstract with show more/less -->
+          <div v-if="result.abstract" class="mb-3">
+            <p class="text-sm text-gray-700">
+              {{ truncateAbstract(result.abstract, index) }}
+            </p>
+            <button 
+              v-if="result.abstract && result.abstract.length > 300" 
+              class="text-blue-600 text-sm mt-1 hover:underline"
+              @click="toggleAbstract(index)"
+            >
+              {{ expandedAbstracts[index] ? 'Show less' : 'Show more' }}
+            </button>
+          </div>
+          
+          <!-- Description if no abstract -->
+          <p v-else-if="result.description" class="text-sm text-gray-700 mb-3">
+            {{ result.description }}
+          </p>
         </div>
         
         <!-- Pagination -->
@@ -172,7 +210,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'nuxt/app'
-import { SearchIcon, XIcon, SettingsIcon, UserIcon, ImageIcon, MapPinIcon, NewspaperIcon, VideoIcon, LoaderIcon, AlertCircleIcon, FileSearchIcon, ChevronLeftIcon, ChevronRightIcon, CompassIcon } from 'lucide-vue-next'
+import { SearchIcon, XIcon, SettingsIcon, UserIcon, ImageIcon, MapPinIcon, NewspaperIcon, VideoIcon, LoaderIcon, AlertCircleIcon, FileSearchIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-vue-next'
+import LlmAnalysis from '~/components/LlmAnalysis.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -180,6 +219,7 @@ const searchQuery = ref('')
 const searchResults = ref([])
 const isLoading = ref(false) 
 const error = ref(null)
+const expandedAbstracts = ref({}) // Add this to track expanded abstracts
 
 // Replace mock implementation with real API call
 const searchAPI = async (query) => {
@@ -200,7 +240,8 @@ const searchAPI = async (query) => {
     const data = await response.json()
     return data.results || [] // Adjust based on your API response structure
   } catch (err) {
-    throw new Error('Terjadi kesalahan saat menghubungi server. Silakan coba lagi.')
+    console.error('Search API error:', err)
+    throw err
   }
 }
 
@@ -208,13 +249,13 @@ const searchAPI = async (query) => {
 const performSearch = async () => {
   if (!searchQuery.value.trim()) return
   
-  // Update URL with new search query
-  router.push(`/search?q=${encodeURIComponent(searchQuery.value.trim())}`)
-  
-  isLoading.value = true
-  error.value = null
-  
   try {
+    // Update URL with new search query
+    router.push(`/search?q=${encodeURIComponent(searchQuery.value.trim())}`)
+    
+    isLoading.value = true
+    error.value = null
+    
     searchResults.value = await searchAPI(searchQuery.value)
   } catch (err) {
     error.value = err.message
@@ -251,4 +292,17 @@ onMounted(async () => {
     isLoading.value = false;
   }
 });
+
+// Function to toggle abstract expansion
+function toggleAbstract(index) {
+  expandedAbstracts.value[index] = !expandedAbstracts.value[index]
+}
+
+// Function to truncate abstract with proper showing/hiding
+function truncateAbstract(abstract, index) {
+  if (expandedAbstracts.value[index]) {
+    return abstract
+  }
+  return abstract.length > 300 ? abstract.substring(0, 300) + '...' : abstract
+}
 </script>
